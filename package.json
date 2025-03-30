@@ -1,0 +1,29 @@
+{
+  "name": "social-credit-31",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "rsbuild build",
+    "check": "biome check --write",
+    "dev": "rsbuild dev --open",
+    "format": "biome format --write",
+    "preview": "rsbuild preview"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@flydotio/dockerfile": "^0.7.9",
+    "@rsbuild/core": "^1.2.16",
+    "@tailwindcss/postcss": "^4.0.17",
+    "@types/alpinejs": "^3.13.11",
+    "supabase": "^2.20.5",
+    "tailwindcss": "^4.0.17",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@marcreichel/alpine-auto-animate": "^1.1.0",
+    "@supabase/supabase-js": "^2.49.3",
+    "alpinejs": "^3.14.9",
+    "pinecone-router": "^6.2.4"
+  }
+}
