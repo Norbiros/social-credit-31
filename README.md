@@ -2,6 +2,11 @@
 
 A social credit tracking system for students and classes, made as an April Fools' joke.
 
+> [!WARNING]  
+> Code quality isn't the best, because I had to implement it in
+> few hours and it newer was meant to be continued.
+
+
 ## ✨ Techstack
 
 I wanted to try a lot of new technologies so I decided to use:
