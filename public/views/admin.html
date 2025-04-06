@@ -1,0 +1,122 @@
+<div x-data="authForm" class="flex justify-center items-center min-h-screen flex-col">
+    <!-- Login Section -->
+    <div x-show="!user" class="mt-5 w-full items-center justify-items-center flex-col flex">
+        <h2 class="text-3xl">Login</h2>
+        <span class="dark:text-neutral-200 mb-5 mx-10">Jeśli nie masz konta, skontaktuj się z administratorami systemu</span>
+
+        <div class="min-w-1/3 flex flex-col gap-2">
+            <input x-model="email" type="text" class="rounded-sm border border-neutral-300 p-2 text-sm" name="email" placeholder="Email" autocomplete="email"/>
+            <input x-model="password" type="password" class="rounded-sm border border-neutral-300 p-2 text-sm" placeholder="Hasło"/>
+            <button x-bind:disabled="loading" x-on:click="login" type="button" class="border border-primary px-4 py-2 text-sm">Uwierzytelnij</button>
+            <p x-text="message"></p>
+        </div>
+    </div>
+
+    <!-- Form to Insert Data into records Table -->
+    <div x-show="user" class="md:w-1/3 mx-10">
+        <h2 class="text-3xl">Czy chcesz dzisiaj złożyć donos?</h2>
+        <button x-on:click="logout" class="cursor-pointer mb-10">Wyloguj się...</button>
+
+        <form class="flex flex-col gap-2" @submit.prevent="insertRecord">
+            <input x-model="from_name" type="text" placeholder="Kto jest zgłaszany?" required class="rounded-sm border border-neutral-300 p-2 text-sm"/>
+
+            <select x-model="from_class" required class="rounded-sm border border-neutral-300 p-2 text-sm">
+                <option value="" disabled selected class="bg-neutral-200 dark:bg-neutral-700">Wybierz klasę zgłaszanego</option>
+                <template x-for="className in classList" :key="className">
+                    <option x-text="className" class="bg-neutral-200 dark:bg-neutral-700"></option>
+                </template>
+            </select>
+
+            <input x-model="to_name" type="text" placeholder="Przez kogo?" required class="rounded-sm border border-neutral-300 p-2 text-sm"/>
+
+            <select x-model="to_class" required class="rounded-sm border border-neutral-300 p-2 text-sm">
+                <option value="" disabled selected class="bg-neutral-200 dark:bg-neutral-700">Wybierz klasę zgłaszającego</option>
+                <template x-for="className in classList" :key="className">
+                    <option x-text="className" class="bg-neutral-200 dark:bg-neutral-700"></option>
+                </template>
+            </select>
+
+            <input x-model="description" type="text" placeholder="Krótki opis..." required class="rounded-sm border border-neutral-300 p-2 text-sm"/>
+
+
+            <input x-model="points" type="number" min="0" placeholder="Za ile punktów?" required class="rounded-sm border border-neutral-300 p-2 text-sm"/>
+
+            <button type="submit" x-bind:disabled="loading" class="border border-primary px-4 py-2 text-sm">Zapisz</button>
+            <p x-text="recordMessage"></p>
+        </form>
+    </div>
+</div>
+
+<script>
+    Alpine.data('authForm', () => ({
+        email: '',
+        password: '',
+        message: '',
+        loading: false,
+        user: null,
+        from_name: '',
+        from_class: '',
+        to_name: '',
+        to_class: '',
+        description: '',
+        points: null,
+        recordMessage: '',
+        classList: ["1AL", "2AL", "3AL", "4AL", "1BL", "2BL", "3BL", "4BL"],
+
+        async init() {
+            const { data: { user } } = await supabase.auth.getUser();
+            this.user = user;
+        },
+
+        async login() {
+            this.loading = true;
+            this.message = '';
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: this.email,
+                password: this.password
+            });
+            this.loading = false;
+            if (error) {
+                this.message = 'Login failed: ' + error.message;
+            } else {
+                this.user = data.user;
+                this.message = 'Login successful!';
+            }
+        },
+
+        async logout() {
+            await supabase.auth.signOut();
+            this.user = null;
+        },
+
+        async insertRecord() {
+            this.loading = true;
+            this.recordMessage = '';
+            const { data, error } = await supabase
+                .from('records')
+                .insert([
+                    {
+                        from_name: this.from_name,
+                        from_class: this.from_class,
+                        from_points: this.points * -1,
+                        to_name: this.to_name,
+                        to_class: this.to_class,
+                        description: this.description,
+                        to_points: this.points
+                    }
+                ]);
+            this.loading = false;
+            if (error) {
+                this.recordMessage = 'Nie udało się zapisać donosu: ' + error.message;
+            } else {
+                this.recordMessage = 'Pomyślnie zapisano donos!';
+                this.from_name = '';
+                this.from_class = '';
+                this.to_name = '';
+                this.to_class = '';
+                this.description = '';
+                this.points = null;
+            }
+        }
+    }));
+</script>
