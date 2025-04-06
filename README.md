@@ -30,3 +30,8 @@ bun dev
 ```bash
 bun format
 ```
+
+# 🖼️ Screenshots
+
+![Landing site](./.github/assets/landing-site.png)
+![Admin panel](./.github/assets/admin-panel.png)
